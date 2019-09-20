@@ -12,11 +12,6 @@ class InvalidPGMFormat(Exception):
     pass
 
 
-def itobs(i: int) -> bytes:
-    """ Convert integer to byte string. """
-    return str(i).encode("ascii")
-
-
 class PGMImage:
     signature: str
     cols: int
@@ -74,12 +69,12 @@ class PGMImage:
                     f"Finished reading {pgm_filename} but content still left."
                 )
 
-    @property
-    def n_pixels(self) -> int:
-        return self.rows * self.cols
-
     def save(self, pgm_filename):
         """ Write this PGM image to a file. """
+
+        def itobs(i: int) -> bytes:
+            """ Convert integer to byte string. """
+            return str(i).encode("ascii")
 
         with open(pgm_filename, "wb") as f:
             lines = [
@@ -90,16 +85,25 @@ class PGMImage:
             ]
             f.writelines(lines)
 
-    def get_histogram(self, normed=False) -> List[int]:
+    @property
+    def n_pixels(self) -> int:
+        return self.rows * self.cols
+
+    def unrolled_pixels(self) -> List[int]:
+        """ Return the image's intensity values as an ordered, row-major, flat array. """
         unrolled_pxls = []
 
         for row in self.pixels:
             for pxl in row:
                 unrolled_pxls.append(int(pxl))
 
+        return unrolled_pxls
+
+    def get_histogram(self, normed: bool = False) -> List[int]:
+        """ Return the quantity of pixels as a list indexed by intensity value. """
         histogram = [0] * self.quantization
 
-        for pxl in unrolled_pxls:
+        for pxl in self.unrolled_pixels():
             histogram[pxl] += 1
 
         if normed:
@@ -108,18 +112,16 @@ class PGMImage:
 
         return histogram
 
-    def show_histogram(self, normed=False, title=None):
+    def show_histogram(self, normed: bool = False, title=None):
+        """ Display a histogram of the image.
+
+        Note: blocks the main thread.
+        """
         import matplotlib.pyplot as plot
 
         # plot.ion()  # Don't block while showing the histogram
 
-        unrolled_pxls = []
-
-        for row in self.pixels:
-            for pxl in row:
-                unrolled_pxls.append(int(pxl))
-
-        plot.hist(unrolled_pxls, bins=255, density=normed)
+        plot.hist(self.unrolled_pixels(), bins=255, density=normed)
 
         plot.xlabel("Pixel Value")
         plot.ylabel("Count" if not normed else "Probability")
