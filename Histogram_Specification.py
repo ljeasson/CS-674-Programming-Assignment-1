@@ -31,7 +31,7 @@ def specify_histogram(img_name, specified_img_name, visualize_results=True):
     p3 = PGMImage(img_name)
 
     for i in range(len(p3.pixels)):
-        p3.pixels[i] = b"".join(bytes([G_inverse_z[b]]) for b in p3.pixels[i])
+        p3.pixels[i] = b"".join(bytes([G_inverse_z[T_r[b]]]) for b in p3.pixels[i])
 
     p3.save(f"specified-to-{p2.name}-{p1.name}")
 
