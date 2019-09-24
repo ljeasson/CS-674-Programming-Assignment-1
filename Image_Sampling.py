@@ -1,26 +1,27 @@
 from PGM import PGMImage
 from PIL import Image
 import numpy as np
-import cv2
 
-def sample_image(path, width, height):
+def sample_image(path, sampling_factor):
     try:  
         with Image.open(path) as image: 
-            #orig_width, orig_height = image.size
+            orig_width, orig_height = image.size
 
-            print("Path:",path," Width:",width," Height:",height)
+            print("Path:",path," Width:",orig_width," Height:",orig_height)
             print()
 
-            image = image.resize((width, height))
+            image = image.resize((orig_width/sampling_factor, orig_height/sampling_factor))
+            image = image.resize((orig_width, orig_height))
             image.show()
             
-            #image.save(str(path)+"_new")  
+            image.save("new_"+str(path))  
 
     except IOError: 
         pass
 
+
 if __name__ == "__main__":
     for img in ("images/lenna.pgm", "images/peppers.pgm"):
-        sample_image(img, 128, 128)
-        sample_image(img, 64, 64)
-        sample_image(img, 32, 32)
+        sample_image(img, 2)
+        sample_image(img, 4)
+        sample_image(img, 8)
