@@ -10,11 +10,11 @@ def sample_image(path, sampling_factor):
             print("Path:",path," Width:",orig_width," Height:",orig_height)
             print()
 
-            image = image.resize((orig_width/sampling_factor, orig_height/sampling_factor))
+            image = image.resize((int(orig_width/sampling_factor), int(orig_height/sampling_factor)))
             image = image.resize((orig_width, orig_height))
             image.show()
             
-            image.save("new_"+str(path))  
+            image.save("images/new_"+str(sampling_factor)+".pgm")  
 
     except IOError: 
         pass
